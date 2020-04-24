@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -100,7 +100,6 @@ namespace Dna
             #endregion
 
             #region Write Content
-
             // Set the content length
             if (content == null)
             {
@@ -112,11 +111,11 @@ namespace Dna
             {
                 // Create content to write
                 var contentString = string.Empty;
-
+                
                 // Serialize to Json?
                 if (sendType == KnownContentSerializers.Json)
                     // Serialize content to Json string
-                    contentString = JsonConvert.SerializeObject(content);
+                    contentString = JsonSerializer.Serialize(content);
                 // Serialize to Xml?
                 else if (sendType == KnownContentSerializers.Xml)
                 {
@@ -247,7 +246,7 @@ namespace Dna
                 if (returnType == KnownContentSerializers.Json)
                 {
                     // Deserialize Json string
-                    result.ServerResponse = JsonConvert.DeserializeObject<TResponse>(result.RawServerResponse);
+                    result.ServerResponse = JsonSerializer.Deserialize<TResponse>(result.RawServerResponse);
                 }
                 // Xml?
                 else if (returnType == KnownContentSerializers.Xml)
@@ -270,7 +269,7 @@ namespace Dna
                     return result;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // If deserialize failed then set error message
                 result.ErrorMessage = "Failed to deserialize server response to the expected type";
